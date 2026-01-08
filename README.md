@@ -14,3 +14,6 @@ Python libraries used:
 Additionally you will need an Nintendo 64 emulator and a ROM for the game.
 
 The frequency of hitting the acceleration button scales linearly with the power output, and the minimum power required to move is 50 W.
+
+
+I will also add functionality for a simple speed sensor, and also only HR modes.
