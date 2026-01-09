@@ -45,19 +45,6 @@ def get_user_mode():
     return app.selected_mode
 
 
-if __name__ == "__main__":
-    mode = get_user_mode()
-
-    if mode == "POWER":
-        print("Initializing Assioma logic...")
-    elif mode == "SPEED":
-        print("Initializing Speed Sensor logic...")
-    elif mode == "HR":
-        print("Initializing Heart Rate (Karvonen) logic...")
-    else:
-        print("No mode selected. Exiting.")
-
-
 class BluetoothSelectionGUI:
     def __init__(self, root, devices):
         self.root = root
@@ -95,3 +82,16 @@ class BluetoothSelectionGUI:
         self.target_address = address
         print(f"Selected Device: {name} - {self.target_address}")
         self.root.destroy()  # Close GUI to start the logic script
+
+
+if __name__ == "__main__":
+    mode = get_user_mode()
+
+    if mode == "POWER":
+        print("Initializing Assioma logic...")
+    elif mode == "SPEED":
+        print("Initializing Speed Sensor logic...")
+    elif mode == "HR":
+        print("Initializing Heart Rate logic...")
+    else:
+        print("No mode selected. Exiting.")
