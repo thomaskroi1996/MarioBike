@@ -1,2 +1,3 @@
 *.pyc
 *.z64
+__pycache__

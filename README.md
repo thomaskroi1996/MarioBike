@@ -10,3 +10,6 @@ If HR, power and speed exceed certain thresholds, you can use an item by holding
 
 Next:
 - difficulty modes (modify minimum for acceleration and items)
+
+User has to be part of input group:
+sudo usermod -aG input $USER

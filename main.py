@@ -1,3 +1,26 @@
+import subprocess
+import sys
+import pkg_resources
+
+def install_requirements():
+    requirements = ["mediapipe", "opencv-python", "bleak", "evdev"]
+ 
+    installed = {pkg.key for pkg in pkg_resources.working_set}
+    missing = [pkg for pkg in requirements if pkg.replace("-", "_") not in installed]
+
+    if missing:
+        print(f"📦 Missing packages detected: {missing}. Installing...")
+        try:
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+            print("All packages installed. Restarting script...")
+            subprocess.call([sys.executable] + sys.argv)
+            sys.exit()
+        except Exception as e:
+            print(f"Failed to install packages: {e}")
+            sys.exit(1)
+
+install_requirements()
+
 import os
 
 os.environ["PYNPUT_BACKEND_KEYBOARD"] = "uinput"
@@ -46,8 +69,8 @@ async def main():
             print(f"Initializing Systems for {mode} mode...")
 
             # steer using webcam
-            # steer_system = VideoSteering()
-            # tg.create_task(steer_system.run())
+            steer_system = VideoSteering()
+            tg.create_task(steer_system.run())
 
             # select mode for acceleration logic
             if mode == "POWER":
