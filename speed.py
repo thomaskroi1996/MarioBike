@@ -1,9 +1,11 @@
-import asyncio
-from bleak import BleakScanner, BleakClient
-import struct
-from evdev import UInput, ecodes as e
 import tkinter as tk
 import gui
+import asyncio
+import struct
+
+from bleak import BleakScanner, BleakClient
+from evdev import UInput, ecodes as e
+from state import shared_state
 
 ui = UInput()
 
@@ -14,7 +16,6 @@ class SpeedLogic:
         self.SPEED_MEASUREMENT_UUID = "00002a5b-0000-1000-8000-00805f9b34fb"
         self.ACC_THRESHOLD = 17
         self.ITEM_THRESHOLD = 20
-        self.current_speed = 0
         self.last_revs = None
         self.last_time = None
         self.wheel_circum_mm = 2105
@@ -54,7 +55,7 @@ class SpeedLogic:
 
     # item release based on speed
     async def speed_item(self):
-        if self.current_speed > self.ITEM_THRESHOLD:
+        if shared_state.speed > self.ITEM_THRESHOLD:
             ui.write(e.EV_KEY, e.KEY_Y, 1)
             ui.syn()
             await asyncio.sleep(0.05)
@@ -62,12 +63,12 @@ class SpeedLogic:
     # acceleration based on speed in km/h
     async def speed_acc(self):
         while True:
-            if self.current_speed < self.ACC_THRESHOLD:
+            if shared_state.speed < self.ACC_THRESHOLD:
                 await asyncio.sleep(0.1)
                 continue
 
             # delay of repeated presses is linear with hr
-            delay = max(0, 0.2 * (1 - (self.current_speed / 190)))
+            delay = max(0, 0.2 * (1 - (shared_state.speed / 190)))
 
             ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 1)
             ui.write(e.EV_KEY, e.KEY_X, 1)

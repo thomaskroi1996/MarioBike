@@ -1,8 +1,10 @@
-import asyncio
-from bleak import BleakScanner, BleakClient
-from evdev import UInput, ecodes as e
 import tkinter as tk
 import gui
+import asyncio
+
+from bleak import BleakScanner, BleakClient
+from evdev import UInput, ecodes as e
+from state import shared_state
 
 ui = UInput()
 
@@ -13,7 +15,6 @@ class HRLogic:
         self.HR_MEASUREMENT_UUID = "00002a37-0000-1000-8000-00805f9b34fb"
         self.ACC_THRESHOLD = 100
         self.ITEM_THRESHOLD = 120
-        self.current_hr = 0
 
     def get_target_address(self, devices):
         root = tk.Tk()
@@ -26,18 +27,18 @@ class HRLogic:
         # data[1]: HR Value (UINT8)
 
         hr_value = data[1]
-        self.current_hr = hr_value
+        shared_state.hr = hr_value
         print(f"\rHeart Rate: {hr_value} BPM")
 
     # hr based acceleration
     async def hr_acc(self):
         while True:
-            if self.current_hr < self.ACC_THRESHOLD:
+            if shared_state.hr < self.ACC_THRESHOLD:
                 await asyncio.sleep(0.1)
                 continue
 
             # delay of repeated presses is linear with hr
-            delay = max(0, 0.2 * (1 - (self.current_hr / 190)))
+            delay = max(0, 0.2 * (1 - (shared_state.hr / 190)))
 
             ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 1)
             ui.write(e.EV_KEY, e.KEY_X, 1)
@@ -50,7 +51,7 @@ class HRLogic:
             await asyncio.sleep(delay)
 
     async def hr_item(self):
-        if self.current_hr > self.ITEM_THRESHOLD:
+        if shared_state.hr > self.ITEM_THRESHOLD:
             ui.write(e.EV_KEY, e.KEY_Y, 1)
             ui.syn()
             await asyncio.sleep(0.05)

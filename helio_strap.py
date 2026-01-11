@@ -1,18 +1,19 @@
 import asyncio
-from bleak import BleakClient
 
+from bleak import BleakClient
+from state import shared_state
 
 class HelioStrap:
     def __init__(self, address):
         self.address = address
-        self.current_hr = 0
+
         # Standard HR UUIDs
         self.HR_MEAS_UUID = "00002a37-0000-1000-8000-00805f9b34fb"
         self.HR_CTRL_UUID = "00002a39-0000-1000-8000-00805f9b34fb"
 
     def callback(self, sender, data):
-        self.current_hr = data[1]
-        print(f"[Helio Strap] HR: {self.current_hr} BPM")
+        shared_state.hr = data[1]
+        print(f"[Helio Strap] HR: {shared_state.hr} BPM")
 
     async def connect(self):
         async with BleakClient(self.address) as client:

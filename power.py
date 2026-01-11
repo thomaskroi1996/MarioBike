@@ -1,9 +1,11 @@
 import asyncio
-from bleak import BleakScanner, BleakClient
-import struct
-from evdev import UInput, ecodes as e
 import tkinter as tk
 import gui
+import struct
+
+from bleak import BleakScanner, BleakClient
+from evdev import UInput, ecodes as e
+from state import shared_state
 
 ui = UInput()
 
@@ -14,7 +16,6 @@ class PowerLogic:
         self.CP_MEASUREMENT_UUID = "00002a63-0000-1000-8000-00805f9b34fb"
         self.ACC_THRESHOLD = 30
         self.ITEM_THRESHOLD = 50
-        self.current_power = 0
 
     def get_target_address(self, devices):
         root = tk.Tk()
@@ -29,7 +30,7 @@ class PowerLogic:
         # data[5:7] = Revolutions
 
         power = struct.unpack("<h", data[2:4])[0]
-        self.current_power = power
+        shared_state.power = power
 
         balance = data[4] / 2.0  # Percentage
 
@@ -41,12 +42,12 @@ class PowerLogic:
     # power based acceleration
     async def power_acc(self):
         while True:
-            if self.current_power < self.ACC_THRESHOLD:
+            if shared_state.power < self.ACC_THRESHOLD:
                 await asyncio.sleep(0.1)
                 continue
 
             # delay of repeated presses is linear with power
-            delay = max(0, 0.2 * (1 - (self.current_power / 200)))
+            delay = max(0, 0.2 * (1 - (shared_state.power / 200)))
 
             ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 1)
             ui.write(e.EV_KEY, e.KEY_X, 1)
@@ -57,10 +58,10 @@ class PowerLogic:
             ui.syn()
 
             await asyncio.sleep(delay)
- 
+
     # power based item use
     async def power_item(self):
-        if self.current_power > self.ITEM_THRESHOLD:
+        if shared_state.power > self.ITEM_THRESHOLD:
             ui.write(e.EV_KEY, e.KEY_Y, 1)
             ui.syn()
             await asyncio.sleep(0.05)

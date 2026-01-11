@@ -1,10 +1,11 @@
 import cv2
 import mediapipe as mp
+import asyncio
+
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 from evdev import UInput, ecodes as e
-import asyncio
-
+from state import shared_state
 
 class VideoSteering:
     def __init__(self, model_path="hand_landmarker.task"):
