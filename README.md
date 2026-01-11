@@ -1,6 +1,6 @@
 Simple setup for using power, heart rate and speed output from bike sensors for accelerating in MarioKart 64, or any other game really.
 
-I used Omarchy to debug, so likely there will be some issues on other OS, even though I tried to generalise it. Ideally, you just have to run "run.sh", and it will download all the packages, and start everything from sensor conenction, to gesture recognition and the game automatically.
+I used Omarchy to debug, so likely there will be some issues on other OS, even though I tried to generalise it. In the future I will use Docker, but for now I just focus on a smooth experience. Ideally, you just have to run "run.sh", and it will download all the packages, and start everything from sensor conenction, to gesture recognition and the game automatically.
 
 Since it is illegal to share ROMS, you have to download it and put it into the directory. I used mupen64plus as my emulator, so the key mappings are specialised for it.
 
