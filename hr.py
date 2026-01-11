@@ -13,8 +13,8 @@ class HRLogic:
     def __init__(self):
         # standard UUID for HR
         self.HR_MEASUREMENT_UUID = "00002a37-0000-1000-8000-00805f9b34fb"
-        self.ACC_THRESHOLD = 100
-        self.ITEM_THRESHOLD = 120
+        self.ACC_THRESHOLD = 50
+        self.ITEM_THRESHOLD = 60
 
     def get_target_address(self, devices):
         root = tk.Tk()
@@ -28,7 +28,7 @@ class HRLogic:
 
         hr_value = data[1]
         shared_state.hr = hr_value
-        print(f"\rHeart Rate: {hr_value} BPM")
+        print(f"\rHeart Rate: {shared_state.hr} BPM")
 
     # hr based acceleration
     async def hr_acc(self):
@@ -40,12 +40,10 @@ class HRLogic:
             # delay of repeated presses is linear with hr
             delay = max(0, 0.2 * (1 - (shared_state.hr / 190)))
 
-            ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 1)
-            ui.write(e.EV_KEY, e.KEY_X, 1)
+            ui.write(e.EV_KEY, e.KEY_A, 1)
             ui.syn()
             await asyncio.sleep(0.05)
-            ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 0)
-            ui.write(e.EV_KEY, e.KEY_X, 0)
+            ui.write(e.EV_KEY, e.KEY_A, 0)
             ui.syn()
 
             await asyncio.sleep(delay)
@@ -54,7 +52,11 @@ class HRLogic:
         if shared_state.hr > self.ITEM_THRESHOLD:
             ui.write(e.EV_KEY, e.KEY_Y, 1)
             ui.syn()
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(0.1)
+            ui.write(e.EV_KEY, e.KEY_Y, 0)
+            ui.syn()
+
+            await asyncio.sleep(3)
 
     # handles bluetooth connection
     async def hr_ble(self):

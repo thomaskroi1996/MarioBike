@@ -24,6 +24,14 @@ class VideoSteering:
 
         self.ui = UInput()
         self.is_running = True
+    # press key and wait duration before releasing
+    async def tap_key(self, key, duration):
+        if duration <= 0: return
+        self.ui.write(e.EV_KEY, key, 1)
+        self.ui.syn()
+        await asyncio.sleep(duration)
+        self.ui.write(e.EV_KEY, key, 0)
+        self.ui.syn()
 
     async def run(self):
         print("Steering System Initialized...")
@@ -49,24 +57,23 @@ class VideoSteering:
                 # just use hand above wrist for information
                 wrist = result.hand_landmarks[0][0]
                 hand_x = wrist.x
+                if hand_x < 0.4:
+                    intensity = (0.4 - hand_x) * 0.2 # Max pulse ~80ms
+                    asyncio.create_task(self.tap_key(e.KEY_LEFT, intensity))
+                elif hand_x > 0.6:
+                    intensity = (hand_x - 0.6) * 0.2 
+                    asyncio.create_task(self.tap_key(e.KEY_RIGHT, intensity))
 
-                if hand_x < 0.35:
-                    target_key = e.KEY_LEFT
-                    steer_dir = "LEFT"
-                elif hand_x > 0.65:
-                    target_key = e.KEY_RIGHT
-                    steer_dir = "RIGHT"
-
-            if current_key and current_key != target_key:
-                self.ui.write(e.EV_KEY, current_key, 0)
-                self.ui.syn()
-                current_key = None
-
-            if target_key and current_key != target_key:
-                self.ui.write(e.EV_KEY, target_key, 1)
-                self.ui.syn()
-                current_key = target_key
-
+            # if current_key and current_key != target_key:
+            #     self.ui.write(e.EV_KEY, current_key, 0)
+            #     self.ui.syn()
+            #     current_key = None
+            #
+            # if target_key and current_key != target_key:
+            #     self.ui.write(e.EV_KEY, target_key, 1)
+            #     self.ui.syn()
+            #     current_key = target_key
+            #
             cv2.line(
                 frame,
                 (int(self.width * 0.35), 0),
@@ -91,7 +98,7 @@ class VideoSteering:
                 2,
             )
 
-            cv2.imshow("Mario Bike Steering", frame)
+            cv2.imshow("Steering", frame)
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
 

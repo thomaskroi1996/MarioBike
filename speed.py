@@ -71,11 +71,9 @@ class SpeedLogic:
             delay = max(0, 0.2 * (1 - (shared_state.speed / 190)))
 
             ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 1)
-            ui.write(e.EV_KEY, e.KEY_X, 1)
             ui.syn()
             await asyncio.sleep(0.05)
             ui.write(e.EV_KEY, e.KEY_LEFTSHIFT, 0)
-            ui.write(e.EV_KEY, e.KEY_X, 0)
             ui.syn()
 
             await asyncio.sleep(delay)

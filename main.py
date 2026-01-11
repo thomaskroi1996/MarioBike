@@ -13,15 +13,15 @@ from steering import VideoSteering
 
 async def start_power_mode():
     run = PowerLogic()
-    await asyncio.gather(run.power_acc(), run.power_ble())
+    await asyncio.gather(run.power_acc(), run.power_ble(), run.power_item())
 
 async def start_hr_mode():
     run = HRLogic()
-    await asyncio.gather(run.hr_acc(), run.hr_ble())
+    await asyncio.gather(run.hr_acc(), run.hr_ble(), run.hr_item())
 
 async def start_speed_mode():
     run = SpeedLogic()
-    await asyncio.gather(run.speed_acc(), run.speed_ble())
+    await asyncio.gather(run.speed_acc(), run.speed_ble(), run.speed_item())
 
 async def launch_game():
     game_command = "mupen64plus mk64.z64"
@@ -46,8 +46,8 @@ async def main():
             print(f"Initializing Systems for {mode} mode...")
 
             # steer using webcam
-            steer_system = VideoSteering()
-            tg.create_task(steer_system.run())
+            # steer_system = VideoSteering()
+            # tg.create_task(steer_system.run())
 
             # select mode for acceleration logic
             if mode == "POWER":
@@ -59,6 +59,10 @@ async def main():
             elif mode == "SPEED":
                 print("Starting SPEED Mode...")
                 tg.create_task(start_speed_mode())
+
+            await asyncio.sleep(1.5)
+
+            tg.create_task(launch_game())
 
     except* Exception as eg:
         for error in eg.exceptions:
