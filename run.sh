@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo usermod -aG input $USER
+
 ENV_NAME="mario_bike"
 REQ_FILE="requirements.txt"
 
